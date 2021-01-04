@@ -1,0 +1,12 @@
+tag v1.0.2
+588017f2d56055fae10213dda047d6d5fe089783
+Theck <theckhd@gmail.com>
+2014-07-16 20:53:21 -0400
+
+Tagging release.
+
+
+--------------------
+
+Theck:
+	- I am good at TOC/Versioning. toc file details updated to 50400 and v1.0.2.
