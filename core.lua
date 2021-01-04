@@ -485,14 +485,22 @@ function Simulationcraft:GetItemStuffs()
 		end
         
 		--GLOVES ENCHANT--
-		local p1, p2 = GetProfessions()
-		local playerProfessionOne,_,playerProfessionOneRank = GetProfessionInfo(p1)
-		local playerProfessionTwo,_,playerProfessionTwoRank = GetProfessionInfo(p2)
-		local addonString = ""
-		
-		if ((simcSlotNames[slotNum] == "hands") and (tokenize(playerProfessionOne)== "engineering" or tokenize(playerProfessionTwo)=="engineering")) then 
-			addonString=",addon=synapse_springs_mark_ii"
-		end
+        local addonString = ""
+		local pid1, pid2 = GetProfessions()
+        if pid1 or pid2 then
+            local firstProf, firstProfRank, secondProf, secondProfRank
+            if pid1 then
+                firstProf,_,firstProfRank = GetProfessionInfo(pid1)
+            end
+            if pid2 then
+                secondProf,_,secondProfRank = GetProfessionInfo(pid2)
+            end
+            
+            if ((simcSlotNames[slotNum] == "hands") and (tokenize(firstProf)== "engineering" or tokenize(secondProf)=="engineering")) then 
+                addonString=",addon=synapse_springs_mark_ii"
+            end
+            
+        end
 
 		
         simcItemStr = simcSlotNames[slotNum] .. "=" .. tokenize(name) .. ",id=" .. itemId .. ",upgrade=" .. upgradeLevel .. gemString .. enchantString.. reforgeString..addonString
@@ -513,9 +521,30 @@ function Simulationcraft:PrintSimcProfile()
     local playerLevel = UnitLevel('player')
     local _, playerRace = UnitRace('player')
     local _, playerSpec,_,_,_,role = GetSpecializationInfo(GetSpecialization())
-    local p1, p2 = GetProfessions()
-    local playerProfessionOne,_,playerProfessionOneRank = GetProfessionInfo(p1)
-    local playerProfessionTwo,_,playerProfessionTwoRank = GetProfessionInfo(p2)
+
+    -- Professions
+    local pid1, pid2 = GetProfessions()
+    local firstProf, firstProfRank, secondProf, secondProfRank
+    if pid1 then
+        firstProf,_,firstProfRank = GetProfessionInfo(pid1)
+    end
+    if pid2 then
+        secondProf,_,secondProfRank = GetProfessionInfo(pid2)
+    end
+    
+    local playerProfessions = ''
+    if pid1 or pid2 then
+        playerProfessions = 'professions='
+        if pid1 then
+            playerProfessions = playerProfessions..tokenize(firstProf)..'='..tostring(firstProfRank)..'/'
+        end
+        if pid2 then
+            playerProfessions = playerProfessions..tokenize(secondProf)..'='..tostring(secondProfRank)
+        end
+    else
+        playerProfessions = ''
+    end
+
     local realm = GetRealmName() -- not used yet (possibly for origin)
 
     -- get player info that's a little more involved
@@ -528,9 +557,7 @@ function Simulationcraft:PrintSimcProfile()
     playerRace = 'race=' .. tokenize(playerRace)
     playerRole = 'role=' .. translateRole(role)
     playerSpec = 'spec=' .. tokenize(playerSpec)
-    local playerProfessions = 'professions='..tokenize(playerProfessionOne)..'='..playerProfessionOneRank..'/'..tokenize(playerProfessionTwo)..'='..playerProfessionTwoRank
-    
-    
+
     -- output testing
     local simulationcraftProfile = player .. '\n'
     simulationcraftProfile = simulationcraftProfile .. playerLevel .. '\n'
